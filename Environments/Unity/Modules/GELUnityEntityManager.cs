@@ -5,9 +5,9 @@ using Object = UnityEngine.Object;
 
 namespace Fusyon.GEL.Unity
 {
-	public class UnityEntityManager : EntityManager<GELEntity>
+	public class GELUnityEntityManager : GELEntityManager<GELEntity>
 	{
-		public UnityEntityManager(Game game) : base(game)
+		public GELUnityEntityManager(GELGame game) : base(game)
 		{
 		}
 
@@ -18,7 +18,9 @@ namespace Fusyon.GEL.Unity
 
 		public override GELEntity Clone(GELEntity original)
 		{
-			return Object.Instantiate(original);
+			GELEntity entity = Object.Instantiate(original);
+			entity.name = entity.name.Replace("(Clone)", "");
+			return entity;
 		}
 
 		public override void Destroy(GELEntity entity)
@@ -29,8 +31,12 @@ namespace Fusyon.GEL.Unity
 		protected override void OnCreate(GELEntity entity)
 		{
 			base.OnCreate(entity);
+			RegisterComponents(entity);
+		}
 
-			foreach (IEntityComponent entityComponent in entity.GetComponents<IEntityComponent>())
+		private void RegisterComponents(GELEntity entity)
+		{
+			foreach (IGELEntityComponent entityComponent in entity.GetComponents<IGELEntityComponent>())
 			{
 				Type[] interfaceTypes = entityComponent.GetType().GetInterfaces();
 				Type[] minInterfaceTypes = interfaceTypes.Except(interfaceTypes.SelectMany(t => t.GetInterfaces())).ToArray();

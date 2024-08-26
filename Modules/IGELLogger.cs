@@ -1,6 +1,6 @@
 namespace Fusyon.GEL
 {
-	public interface ILogger
+	public interface IGELLogger
 	{
 		void Info(object message);
 		void Warn(object message);

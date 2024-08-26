@@ -1,10 +1,10 @@
-using UnityEngine;
+using System.Numerics;
 
 namespace Fusyon.GEL
 {
-	public interface IInput
+	public interface IGELInput
 	{
-		Vector2 MousePosition { get; }
+		Vector3 MousePosition { get; }
 
 		bool IsButtonPressed(string name);
 		bool WasButtonPressed(string name);

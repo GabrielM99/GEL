@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Fusyon.GEL
 {
-	public abstract class Tree
+	public abstract class GELTree
 	{
 		private enum NodeRequestType
 		{
@@ -13,32 +13,32 @@ namespace Fusyon.GEL
 
 		private struct NodeRequest
 		{
-			public Node Node { get; set; }
+			public GELNode Node { get; set; }
 			public NodeRequestType Type { get; set; }
 
-			public NodeRequest(Node node, NodeRequestType type)
+			public NodeRequest(GELNode node, NodeRequestType type)
 			{
 				Node = node;
 				Type = type;
 			}
 		}
 
-		public Game Game { get; internal set; }
+		public GELGame Game { get; internal set; }
 
 		private bool IsStarted { get; set; }
 		private Stack<NodeRequest> Requests { get; set; }
-		private List<Node> Nodes { get; set; }
+		private List<GELNode> Nodes { get; set; }
 
-		protected internal Tree()
+		protected internal GELTree()
 		{
-			Nodes = new List<Node>();
+			Nodes = new List<GELNode>();
 			Requests = new Stack<NodeRequest>();
 		}
 
 		protected virtual void OnLoad() { }
 		protected virtual void OnUnload() { }
 
-		public void CreateNode(Node node, Node parent = null)
+		public void CreateNode(GELNode node, GELNode parent = null)
 		{
 			node.Game = Game;
 			node.Tree = this;
@@ -54,14 +54,14 @@ namespace Fusyon.GEL
 			}
 		}
 
-		public T CreateNode<T>(Node parent = null) where T : Node
+		public T CreateNode<T>(GELNode parent = null) where T : GELNode
 		{
 			T script = Activator.CreateInstance<T>();
 			CreateNode(script, parent);
 			return script;
 		}
 
-		public void DestroyNode(Node node)
+		public void DestroyNode(GELNode node)
 		{
 			if (node.IsDestroyed)
 			{
@@ -102,14 +102,14 @@ namespace Fusyon.GEL
 			IsStarted = false;
 		}
 
-		private void OnCreateNode(Node node)
+		private void OnCreateNode(GELNode node)
 		{
 			node.ID = Nodes.Count;
 			node.OnCreate();
 			Nodes.Add(node);
 		}
 
-		private void OnDestroyNode(Node node)
+		private void OnDestroyNode(GELNode node)
 		{
 			node.OnDestroy();
 			node.IsDestroyed = true;
@@ -117,14 +117,14 @@ namespace Fusyon.GEL
 			int id = node.ID;
 			int lastID = Nodes.Count - 1;
 
-			Node lastNode = Nodes[lastID];
+			GELNode lastNode = Nodes[lastID];
 			lastNode.ID = id;
 			Nodes[id] = Nodes[lastID];
 
 			Nodes.RemoveAt(lastID);
 		}
 
-		private void CreateNodeRequest(Node node, NodeRequestType type)
+		private void CreateNodeRequest(GELNode node, NodeRequestType type)
 		{
 			Requests.Push(new NodeRequest(node, type));
 		}
@@ -134,7 +134,7 @@ namespace Fusyon.GEL
 			while (Requests.Count > 0)
 			{
 				NodeRequest request = Requests.Pop();
-				Node node = request.Node;
+				GELNode node = request.Node;
 				NodeRequestType type = request.Type;
 
 				if (type == NodeRequestType.Create)
@@ -148,9 +148,9 @@ namespace Fusyon.GEL
 			}
 		}
 
-		private void ProcessNodes(Action<Node> action, bool ignoreDisabled = false)
+		private void ProcessNodes(Action<GELNode> action, bool ignoreDisabled = false)
 		{
-			foreach (Node node in Nodes)
+			foreach (GELNode node in Nodes)
 			{
 				if (ignoreDisabled && !node.IsEnabled)
 				{

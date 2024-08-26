@@ -2,14 +2,15 @@ using System.Numerics;
 
 namespace Fusyon.GEL.Custom
 {
-	public class Entity : IEntity
+	public class GELCustomEntity : IGELEntity
 	{
-		public Game Game { get; set; }
-		public Node Node { get; set; }
-		public Vector3 Position { get; set; }
-		public Vector3 Rotation { get; set; }
-		public Vector3 Scale { get; set; }
-		public bool Visible { get; set; }
+		public virtual Vector3 Position { get; set; }
+		public virtual Vector3 Rotation { get; set; }
+		public virtual Vector3 Scale { get; set; }
+		public virtual bool Visible { get; set; }
+
+		public GELGame Game { get; set; }
+		public GELNode Node { get; set; }
 
 		public virtual void OnCreate() { }
 		public virtual void OnUpdate(float deltaTime) { }

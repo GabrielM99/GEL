@@ -4,9 +4,9 @@ using UnityEngine.AddressableAssets;
 
 namespace Fusyon.GEL.Unity
 {
-    public class UnityAdressableResources : IResources
+    public class GELUnityAdressableResources : IGELResources
     {
-        public T Load<T>(string path)
+        public T Load<T>(string path) where T : IGELResource
         {
             object asset = Addressables.LoadAssetAsync<object>(path).WaitForCompletion();
 

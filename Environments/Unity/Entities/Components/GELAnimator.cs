@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Fusyon.GEL.Unity
 {
 	[RequireComponent(typeof(Animator))]
-	public class GELAnimator : GELComponent<Animator>, IAnimatorComponent
+	public class GELAnimator : GELComponent<Animator>, IGELAnimatorComponent
 	{
 		public void Play(string name, float speed = 1f)
 		{

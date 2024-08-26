@@ -2,22 +2,22 @@ using System.Collections.Generic;
 
 namespace Fusyon.GEL
 {
-	public class Node
+	public class GELNode
 	{
 		public bool IsEnabled { get; private set; } = true;
 
-		public Game Game { get; internal set; }
-		public Tree Tree { get; internal set; }
-		public Node Parent { get; internal set; }
+		public GELGame Game { get; internal set; }
+		public GELTree Tree { get; internal set; }
+		public GELNode Parent { get; internal set; }
 
 		internal int ID { get; set; }
 		internal bool IsDestroyed { get; set; }
 
-		private List<Node> Children { get; set; }
+		private List<GELNode> Children { get; set; }
 
-		public Node()
+		public GELNode()
 		{
-			Children = new List<Node>();
+			Children = new List<GELNode>();
 		}
 
 		protected internal virtual void OnCreate() { }
@@ -27,7 +27,7 @@ namespace Fusyon.GEL
 		protected internal virtual void OnDisable() { }
 		protected internal virtual void OnDestroy() { }
 
-		public T CreateChild<T>() where T : Node
+		public T CreateChildNode<T>() where T : GELNode
 		{
 			T node = Tree?.CreateNode<T>(this);
 			Children.Add(node);
@@ -52,7 +52,7 @@ namespace Fusyon.GEL
 			{
 				OnEnable();
 
-				foreach (Node node in Children)
+				foreach (GELNode node in Children)
 				{
 					node.Enable();
 				}
@@ -67,7 +67,7 @@ namespace Fusyon.GEL
 			{
 				OnDisable();
 
-				foreach (Node node in Children)
+				foreach (GELNode node in Children)
 				{
 					node.Disable();
 				}

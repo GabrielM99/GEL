@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Fusyon.GEL.Unity
 {
-	public class UnityLogger : ILogger
+	public class GELUnityLogger : IGELLogger
 	{
 		public void Info(object message)
 		{

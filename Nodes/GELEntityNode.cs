@@ -1,8 +1,8 @@
 namespace Fusyon.GEL
 {
-	public class EntityNode : EntityNode<IEntity> { }
+	public class GELEntityNode : GELEntityNode<IGELEntity> { }
 
-	public class EntityNode<T> : Node where T : IEntity
+	public class GELEntityNode<T> : GELNode where T : IGELEntity
 	{
 		private T m_Entity;
 

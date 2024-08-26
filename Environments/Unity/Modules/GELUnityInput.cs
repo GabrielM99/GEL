@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Fusyon.GEL.Unity
 {
-	public class UnityInput : IInput
+	public class GELUnityInput : IGELInput
 	{
-		public Vector2 MousePosition => Input.mousePosition;
+		public System.Numerics.Vector3 MousePosition => Input.mousePosition.ToGEL();
 
 		public bool IsButtonPressed(string name)
 		{
