@@ -28,10 +28,12 @@ namespace Fusyon.GEL
 		private bool IsStarted { get; set; }
 		private Stack<NodeRequest> Requests { get; set; }
 		private List<GELNode> Nodes { get; set; }
+		private Stack<GELNode> UnstartedNodes { get; set; }
 
 		protected internal GELTree()
 		{
 			Nodes = new List<GELNode>();
+			UnstartedNodes = new Stack<GELNode>();
 			Requests = new Stack<NodeRequest>();
 		}
 
@@ -87,11 +89,13 @@ namespace Fusyon.GEL
 		internal void Update(float deltaTime)
 		{
 			ProcessNodeRequests();
+			ProcessUnstartedNodes();
 			ProcessNodes((node) => node.OnUpdate(deltaTime), true);
 		}
 
 		internal void FixedUpdate(float deltaTime)
 		{
+			ProcessUnstartedNodes();
 			ProcessNodes((node) => node.OnFixedUpdate(deltaTime), true);
 		}
 
@@ -106,6 +110,7 @@ namespace Fusyon.GEL
 		{
 			node.ID = Nodes.Count;
 			node.OnCreate();
+			UnstartedNodes.Push(node);
 			Nodes.Add(node);
 		}
 
@@ -145,6 +150,15 @@ namespace Fusyon.GEL
 				{
 					OnDestroyNode(node);
 				}
+			}
+		}
+
+		private void ProcessUnstartedNodes()
+		{
+			while (UnstartedNodes.Count > 0)
+			{
+				GELNode node = UnstartedNodes.Pop();
+				node.Start();
 			}
 		}
 

@@ -6,17 +6,17 @@ namespace Fusyon.GEL
 	public class GELGame
 	{
 		public GELTree Tree { get; private set; }
+		public GELFactory Factory { get; set; }
+		public GELEvents Events { get; set; }
 		public IGELLogger Logger { get; set; }
 		public IGELResources Resources { get; set; }
-		public IGELEntityManager EntityManager { get; set; }
 		public IGELInput Input { get; set; }
-		public IGELEventSystem EventSystem { get; set; }
 		public IGELPhysics Physics { get; set; }
 
 		public GELGame()
 		{
-			EntityManager = new GELCustomEntityManager(this);
-			EventSystem = new GELCustomEventSystem();
+			Factory = new GELFactory(this);
+			Events = new GELEvents();
 		}
 
 		public void LoadTree<T>() where T : GELTree
