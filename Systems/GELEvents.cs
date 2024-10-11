@@ -12,7 +12,7 @@ namespace Fusyon.GEL.Custom
 			HandlersByType = new Dictionary<Type, List<Action<object>>>();
 		}
 
-		public void Raise<T>(T e)
+		public virtual void Raise<T>(T e)
 		{
 			Type type = typeof(T);
 
@@ -25,7 +25,7 @@ namespace Fusyon.GEL.Custom
 			}
 		}
 
-		public void Handle<T>(Action<T> handler)
+		public virtual void Handle<T>(Action<T> handler)
 		{
 			Type type = typeof(T);
 

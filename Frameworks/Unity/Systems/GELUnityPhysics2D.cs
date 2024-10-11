@@ -1,18 +1,18 @@
 using UnityEngine;
 
-namespace Fusyon.GEL
+namespace Fusyon.GEL.Unity
 {
     public class GELUnityPhysics2D : IGELPhysics
     {
-        public IGELEntity Raycast(System.Numerics.Vector3 origin, System.Numerics.Vector3 direction, float distance = float.PositiveInfinity, int layerMask = 0)
+        public GELEntity Raycast(System.Numerics.Vector3 origin, System.Numerics.Vector3 direction, float distance = float.PositiveInfinity, int layerMask = int.MaxValue)
         {
-            RaycastHit2D hit = Physics2D.Raycast(new Vector2(origin.X, origin.Y), new Vector2(direction.X, direction.Y), distance, layerMask);
+            RaycastHit2D hit = Physics2D.Raycast(origin.ToUnity(), direction.ToUnity(), distance);
 
             if (hit.collider != null)
             {
-                if (hit.collider.TryGetComponent(out GELBehaviour behaviour))
+                if (hit.collider.TryGetComponent(out GELObject behaviour))
                 {
-                    IGELEntity entity = behaviour.Entity;
+                    GELEntity entity = behaviour.Entity;
 
                     if (entity != null)
                     {

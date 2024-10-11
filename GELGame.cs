@@ -5,37 +5,40 @@ namespace Fusyon.GEL
 {
 	public class GELGame
 	{
-		public GELTree Tree { get; private set; }
-		public GELFactory Factory { get; set; }
+		public GELScene Scene { get; private set; }
 		public GELEvents Events { get; set; }
 		public IGELLogger Logger { get; set; }
-		public IGELResources Resources { get; set; }
+		public GELResources Resources { get; set; }
+		public GELObjectManager ObjectManager { get; set; }
 		public IGELInput Input { get; set; }
 		public IGELPhysics Physics { get; set; }
+		public Action<GELScene> OnSceneLoaded { get; set; }
 
 		public GELGame()
 		{
-			Factory = new GELFactory(this);
 			Events = new GELEvents();
+			Resources = new GELResources();
+			ObjectManager = new GELObjectManager();
 		}
 
-		public void LoadTree<T>() where T : GELTree
+		public void LoadScene<T>() where T : GELScene
 		{
-			T tree = Activator.CreateInstance<T>();
-			tree.Game = this;
-			Tree?.Unload();
-			Tree = tree;
-			tree.Load();
+			T scene = Activator.CreateInstance<T>();
+			scene.Game = this;
+			Scene?.Unload();
+			Scene = scene;
+			OnSceneLoaded?.Invoke(scene);
+			scene.Load();
 		}
 
 		public void Update(float deltaTime)
 		{
-			Tree?.Update(deltaTime);
+			Scene?.Update(deltaTime);
 		}
 
 		public void FixedUpdate(float deltaTime)
 		{
-			Tree?.FixedUpdate(deltaTime);
+			Scene?.FixedUpdate(deltaTime);
 		}
 	}
 }
