@@ -6,10 +6,12 @@ namespace Fusyon.GEL
 	public class GELResources
 	{
 		private Dictionary<string, Func<object>> LoaderByPath { get; }
+		private Dictionary<string, object> ResourceByPath { get; }
 
 		public GELResources()
 		{
 			LoaderByPath = new Dictionary<string, Func<object>>();
+			ResourceByPath = new Dictionary<string, object>();
 		}
 
 		public void Add(string path, Func<object> loader)
@@ -19,7 +21,13 @@ namespace Fusyon.GEL
 
 		public T Load<T>(string path)
 		{
-			return (T)LoaderByPath[path]?.Invoke();
+			if (!ResourceByPath.TryGetValue(path, out object resource))
+			{
+				resource = LoaderByPath[path]?.Invoke();
+				ResourceByPath[path] = resource;
+			}
+
+			return (T)resource;
 		}
 	}
 }

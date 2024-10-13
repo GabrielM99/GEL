@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -23,31 +24,32 @@ namespace Fusyon.GEL.Unity
             Game.FixedUpdate(Time.fixedDeltaTime);
         }
 
-        public void AddResource<T>(string originalPath, string virtualPath)
+        public void AddResource<T>(string virtualPath, string realPath)
         {
-            Game.Resources.Add(virtualPath, () => LoadAddressableResource<T>(originalPath));
+            Game.Resources.Add(virtualPath, () => LoadAddressableResource<T>(realPath));
         }
 
-        public void AddResourceLoader(string virtualPath, object resource)
+        public void AddResource(string virtualPath, string realPath, bool readAsText = false)
+        {
+            string fullPath = Path.Combine(Application.dataPath, realPath);
+            Game.Resources.Add(virtualPath, () => readAsText ? File.ReadAllText(fullPath) : File.ReadAllBytes(fullPath));
+        }
+
+        public void AddResource(string virtualPath, object resource)
         {
             Game.Resources.Add(virtualPath, () => resource);
         }
 
         public T LoadAddressableResource<T>(string path)
         {
-            object asset = Addressables.LoadAssetAsync<object>(path).WaitForCompletion();
+            Type type = typeof(T);
 
-            if (asset is GameObject gameObject)
+            if (typeof(Component).IsAssignableFrom(type) || type.IsInterface)
             {
-                Type type = typeof(T);
-
-                if (typeof(Component).IsAssignableFrom(type) || type.IsInterface)
-                {
-                    return gameObject.GetComponent<T>();
-                }
+                return Addressables.LoadAssetAsync<GameObject>(path).WaitForCompletion().GetComponent<T>();
             }
 
-            return (T)asset;
+            return Addressables.LoadAssetAsync<T>(path).WaitForCompletion();
         }
     }
 }

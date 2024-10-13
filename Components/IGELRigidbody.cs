@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Fusyon.GEL
 {
-	public interface IGELRigidbody2D : IGELComponent
+	public interface IGELRigidbody
 	{
 		Vector3 LinearVelocity { get; set; }
 		Vector3 AngularVelocity { get; set; }

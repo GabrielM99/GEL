@@ -1,3 +1,4 @@
+using System;
 using Fusyon.GEL.Unity;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -5,7 +6,7 @@ using UnityEngine.Tilemaps;
 namespace Fusyon.GEL
 {
 	[RequireComponent(typeof(Tilemap))]
-	public class GELTilemap : GELComponent<Tilemap>, IGELTilemap
+	public class GELTilemap : GELBehaviour<Tilemap>, IGELTilemap
 	{
 		public void SetTile(System.Numerics.Vector3 position, object tile)
 		{

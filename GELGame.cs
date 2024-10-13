@@ -6,19 +6,19 @@ namespace Fusyon.GEL
 	public class GELGame
 	{
 		public GELScene Scene { get; private set; }
-		public GELEvents Events { get; set; }
+		public GELMessages Messages { get; set; }
 		public IGELLogger Logger { get; set; }
 		public GELResources Resources { get; set; }
-		public GELObjectManager ObjectManager { get; set; }
+		public GELEntityManager EntityManager { get; set; }
 		public IGELInput Input { get; set; }
 		public IGELPhysics Physics { get; set; }
 		public Action<GELScene> OnSceneLoaded { get; set; }
 
 		public GELGame()
 		{
-			Events = new GELEvents();
+			Messages = new GELMessages();
 			Resources = new GELResources();
-			ObjectManager = new GELObjectManager();
+			EntityManager = new GELEntityManager(this);
 		}
 
 		public void LoadScene<T>() where T : GELScene

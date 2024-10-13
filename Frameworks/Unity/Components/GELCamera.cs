@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Fusyon.GEL.Unity
 {
 	[RequireComponent(typeof(Camera))]
-	public class GELCamera : GELComponent<Camera>, IGELCamera
+	public class GELCamera : GELBehaviour<Camera>, IGELCamera
 	{
 		public System.Numerics.Vector3 ScreenToWorldPosition(System.Numerics.Vector3 position)
 		{

@@ -2,9 +2,9 @@ using System.Numerics;
 
 namespace Fusyon.GEL
 {
-	public interface IGELObject
+	public interface IGELEntity
 	{
-		GELEntity Entity { get; set; }
+		GELScript Script { get; set; }
 		Vector3 Position { get; set; }
 		Vector3 Rotation { get; set; }
 		Vector3 Scale { get; set; }

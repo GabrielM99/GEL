@@ -5,80 +5,80 @@ namespace Fusyon.GEL
 {
 	public abstract class GELScene
 	{
-		private enum EntityRequestType
+		private enum ScriptRequestType
 		{
 			Create,
 			Destroy
 		}
 
-		private struct EntityRequest
+		private struct ScriptRequest
 		{
-			public GELEntity Entity { get; }
-			public EntityRequestType Type { get; }
+			public GELScript Script { get; }
+			public ScriptRequestType Type { get; }
 
-			public EntityRequest(GELEntity entity, EntityRequestType type)
+			public ScriptRequest(GELScript script, ScriptRequestType type)
 			{
-				Entity = entity;
+				Script = script;
 				Type = type;
 			}
 		}
 
 		public GELGame Game { get; internal set; }
-		public Action<GELEntity> OnEntityCreated { get; set; }
-		public Action<GELEntity> OnEntityDestroyed { get; set; }
+		public Action<GELScript> OnScriptCreated { get; set; }
+		public Action<GELScript> OnScriptDestroyed { get; set; }
 
 		private bool IsStarted { get; set; }
-		private Stack<EntityRequest> Requests { get; set; }
-		private List<GELEntity> Entities { get; set; }
-		private Stack<GELEntity> UnstartedEntities { get; set; }
+		private Stack<ScriptRequest> Requests { get; set; }
+		private List<GELScript> Entities { get; set; }
+		private Stack<GELScript> UnstartedEntities { get; set; }
 
 		protected internal GELScene()
 		{
-			Entities = new List<GELEntity>();
-			UnstartedEntities = new Stack<GELEntity>();
-			Requests = new Stack<EntityRequest>();
+			Entities = new List<GELScript>();
+			UnstartedEntities = new Stack<GELScript>();
+			Requests = new Stack<ScriptRequest>();
 		}
 
 		protected virtual void OnLoad() { }
 		protected virtual void OnUnload() { }
 
-		public void CreateEntity(GELEntity entity, GELEntity parent = null)
+		public void CreateScript(GELScript script, GELScript parent = null)
 		{
-			entity.Game = Game;
-			entity.Scene = this;
-			entity.Parent = parent;
+			script.Game = Game;
+			script.Scene = this;
+			script.Parent = parent;
 
 			if (IsStarted)
 			{
-				CreateEntityRequest(entity, EntityRequestType.Create);
+				CreateScriptRequest(script, ScriptRequestType.Create);
 			}
 			else
 			{
-				OnCreateEntity(entity);
+				OnCreateScript(script);
 			}
 		}
 
-		public T CreateEntity<T>(GELEntity parent = null) where T : GELEntity
+		public T CreateScript<T>(GELScript parent = null) where T : GELScript
 		{
 			T script = Activator.CreateInstance<T>();
-			CreateEntity(script, parent);
+			CreateScript(script, parent);
 			return script;
 		}
 
-		public void DestroyEntity(GELEntity entity)
+		public void DestroyScript(GELScript script)
 		{
-			if (entity.IsDestroyed)
+			if (script.IsDestroyed)
 			{
 				return;
 			}
 
 			if (IsStarted)
 			{
-				CreateEntityRequest(entity, EntityRequestType.Destroy);
+				CreateScriptRequest(script, ScriptRequestType.Destroy);
 			}
 			else
 			{
-				OnDestroyEntity(entity);
+				OnDestroyScript(script);
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace Fusyon.GEL
 
 		internal void Update(float deltaTime)
 		{
-			ProcessEntityRequests();
+			ProcessScriptRequests();
 			ProcessUnstartedEntities();
 			ProcessEntities((entitiy) => entitiy.OnUpdate(deltaTime), true);
 		}
@@ -98,64 +98,64 @@ namespace Fusyon.GEL
 		internal void FixedUpdate(float deltaTime)
 		{
 			ProcessUnstartedEntities();
-			ProcessEntities((entity) => entity.OnFixedUpdate(deltaTime), true);
+			ProcessEntities((script) => script.OnFixedUpdate(deltaTime), true);
 		}
 
 		internal void Unload()
 		{
-			ProcessEntities((entity) => OnDestroyEntity(entity, false));
+			ProcessEntities((script) => OnDestroyScript(script, false));
 			OnUnload();
 			IsStarted = false;
 		}
 
-		private void OnCreateEntity(GELEntity entity)
+		private void OnCreateScript(GELScript script)
 		{
-			entity.ID = Entities.Count;
-			OnEntityCreated?.Invoke(entity);
-			entity.OnCreate();
-			UnstartedEntities.Push(entity);
-			Entities.Add(entity);
+			script.ID = Entities.Count;
+			OnScriptCreated?.Invoke(script);
+			script.OnCreate();
+			UnstartedEntities.Push(script);
+			Entities.Add(script);
 		}
 
-		private void OnDestroyEntity(GELEntity entity, bool cleanUp = true)
+		private void OnDestroyScript(GELScript script, bool cleanUp = true)
 		{
-			OnEntityDestroyed?.Invoke(entity);
-			entity.OnDestroy();
+			OnScriptDestroyed?.Invoke(script);
+			script.OnDestroy();
 
 			if (cleanUp)
 			{
-				entity.IsDestroyed = true;
+				script.IsDestroyed = true;
 
-				int id = entity.ID;
+				int id = script.ID;
 				int lastID = Entities.Count - 1;
 
-				GELEntity lastEntity = Entities[lastID];
-				lastEntity.ID = id;
+				GELScript lastScript = Entities[lastID];
+				lastScript.ID = id;
 				Entities[id] = Entities[lastID];
 
 				Entities.RemoveAt(lastID);
 			}
 		}
 
-		private void CreateEntityRequest(GELEntity entity, EntityRequestType type)
+		private void CreateScriptRequest(GELScript script, ScriptRequestType type)
 		{
-			Requests.Push(new EntityRequest(entity, type));
+			Requests.Push(new ScriptRequest(script, type));
 		}
 
-		private void ProcessEntityRequests()
+		private void ProcessScriptRequests()
 		{
 			while (Requests.Count > 0)
 			{
-				EntityRequest request = Requests.Pop();
-				GELEntity entity = request.Entity;
+				ScriptRequest request = Requests.Pop();
+				GELScript script = request.Script;
 
 				switch (request.Type)
 				{
-					case EntityRequestType.Create:
-						OnCreateEntity(entity);
+					case ScriptRequestType.Create:
+						OnCreateScript(script);
 						break;
-					case EntityRequestType.Destroy:
-						OnDestroyEntity(entity);
+					case ScriptRequestType.Destroy:
+						OnDestroyScript(script);
 						break;
 				}
 			}
@@ -165,21 +165,21 @@ namespace Fusyon.GEL
 		{
 			while (UnstartedEntities.Count > 0)
 			{
-				GELEntity entity = UnstartedEntities.Pop();
-				entity.Start();
+				GELScript script = UnstartedEntities.Pop();
+				script.Start();
 			}
 		}
 
-		private void ProcessEntities(Action<GELEntity> action, bool ignoreDisabled = false)
+		private void ProcessEntities(Action<GELScript> action, bool ignoreDisabled = false)
 		{
-			foreach (GELEntity entity in Entities)
+			foreach (GELScript script in Entities)
 			{
-				if (ignoreDisabled && !entity.Enabled)
+				if (ignoreDisabled && !script.Enabled)
 				{
 					continue;
 				}
 
-				action?.Invoke(entity);
+				action?.Invoke(script);
 			}
 		}
 	}
