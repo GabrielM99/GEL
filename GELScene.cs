@@ -29,13 +29,13 @@ namespace Fusyon.GEL
 
 		private bool IsStarted { get; set; }
 		private Stack<ScriptRequest> Requests { get; set; }
-		private List<GELScript> Entities { get; set; }
-		private Stack<GELScript> UnstartedEntities { get; set; }
+		private List<GELScript> Scripts { get; set; }
+		private Stack<GELScript> UnstartedScripts { get; set; }
 
 		protected internal GELScene()
 		{
-			Entities = new List<GELScript>();
-			UnstartedEntities = new Stack<GELScript>();
+			Scripts = new List<GELScript>();
+			UnstartedScripts = new Stack<GELScript>();
 			Requests = new Stack<ScriptRequest>();
 		}
 
@@ -91,30 +91,30 @@ namespace Fusyon.GEL
 		internal void Update(float deltaTime)
 		{
 			ProcessScriptRequests();
-			ProcessUnstartedEntities();
-			ProcessEntities((entitiy) => entitiy.OnUpdate(deltaTime), true);
+			ProcessUnstartedScripts();
+			ProcessScripts((script) => script.OnUpdate(deltaTime), true);
 		}
 
 		internal void FixedUpdate(float deltaTime)
 		{
-			ProcessUnstartedEntities();
-			ProcessEntities((script) => script.OnFixedUpdate(deltaTime), true);
+			ProcessUnstartedScripts();
+			ProcessScripts((script) => script.OnFixedUpdate(deltaTime), true);
 		}
 
 		internal void Unload()
 		{
-			ProcessEntities((script) => OnDestroyScript(script, false));
+			ProcessScripts((script) => OnDestroyScript(script, false));
 			OnUnload();
 			IsStarted = false;
 		}
 
 		private void OnCreateScript(GELScript script)
 		{
-			script.ID = Entities.Count;
+			script.ID = Scripts.Count;
 			OnScriptCreated?.Invoke(script);
 			script.OnCreate();
-			UnstartedEntities.Push(script);
-			Entities.Add(script);
+			UnstartedScripts.Push(script);
+			Scripts.Add(script);
 		}
 
 		private void OnDestroyScript(GELScript script, bool cleanUp = true)
@@ -127,13 +127,13 @@ namespace Fusyon.GEL
 				script.IsDestroyed = true;
 
 				int id = script.ID;
-				int lastID = Entities.Count - 1;
+				int lastID = Scripts.Count - 1;
 
-				GELScript lastScript = Entities[lastID];
+				GELScript lastScript = Scripts[lastID];
 				lastScript.ID = id;
-				Entities[id] = Entities[lastID];
+				Scripts[id] = Scripts[lastID];
 
-				Entities.RemoveAt(lastID);
+				Scripts.RemoveAt(lastID);
 			}
 		}
 
@@ -161,18 +161,18 @@ namespace Fusyon.GEL
 			}
 		}
 
-		private void ProcessUnstartedEntities()
+		private void ProcessUnstartedScripts()
 		{
-			while (UnstartedEntities.Count > 0)
+			while (UnstartedScripts.Count > 0)
 			{
-				GELScript script = UnstartedEntities.Pop();
+				GELScript script = UnstartedScripts.Pop();
 				script.Start();
 			}
 		}
 
-		private void ProcessEntities(Action<GELScript> action, bool ignoreDisabled = false)
+		private void ProcessScripts(Action<GELScript> action, bool ignoreDisabled = false)
 		{
-			foreach (GELScript script in Entities)
+			foreach (GELScript script in Scripts)
 			{
 				if (ignoreDisabled && !script.Enabled)
 				{
